@@ -445,3 +445,37 @@ function atualizarStatusNotion(pageId, novoStatus) {
   
   UrlFetchApp.fetch(url, options);
 }
+
+// ==========================================
+// 6. DIAGNÓSTICO (rodar manualmente pelo editor)
+// ==========================================
+function diagnosticarEmails() {
+  Logger.log('--- Conexão Notion (base de e-mails) ---');
+  const resposta = UrlFetchApp.fetch(`https://api.notion.com/v1/databases/${getDatabaseId()}`, {
+    method: 'get',
+    headers: getHeaders(),
+    muteHttpExceptions: true
+  });
+  const db = JSON.parse(resposta.getContentText());
+
+  if (resposta.getResponseCode() !== 200) {
+    Logger.log(`ERRO (${resposta.getResponseCode()}): ${db.message}`);
+    return;
+  }
+
+  Logger.log('OK. Propriedades encontradas:');
+  for (const nome in db.properties) {
+    Logger.log(`- "${nome}" (${db.properties[nome].type})`);
+  }
+
+  Logger.log('--- Opções da coluna Script x modelos do código ---');
+  const colunaScript = db.properties['Script'];
+  if (!colunaScript || !colunaScript.select) {
+    Logger.log('ERRO: coluna "Script" (seleção) não encontrada.');
+    return;
+  }
+  colunaScript.select.options.forEach(opcao => {
+    const existe = !!MODELOS[opcao.name];
+    Logger.log(`${existe ? 'OK  ' : 'SEM MODELO'} → "${opcao.name}"`);
+  });
+}
