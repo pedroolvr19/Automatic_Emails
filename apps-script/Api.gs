@@ -3,7 +3,6 @@
 // ===================================================================
 // Implantar como App da Web:
 //   Executar como: Eu  |  Quem pode acessar: Qualquer pessoa
-// A proteção é feita pela propriedade do script PAINEL_SENHA.
 //
 // Ações aceitas no campo "acao" do POST:
 //   emails        → dispararEmails()                 (Emails.gs)
@@ -27,11 +26,6 @@ function doPost(e) {
     corpo = JSON.parse((e && e.postData && e.postData.contents) || '{}');
   } catch (erro) {
     return responderJson({ ok: false, mensagem: 'Requisição inválida.' });
-  }
-
-  const senhaCorreta = PropertiesService.getScriptProperties().getProperty('PAINEL_SENHA');
-  if (!senhaCorreta || corpo.senha !== senhaCorreta) {
-    return responderJson({ ok: false, mensagem: 'Senha incorreta.' });
   }
 
   const executar = ACOES[corpo.acao];

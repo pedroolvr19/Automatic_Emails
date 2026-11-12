@@ -6,13 +6,13 @@ Painel único para as automações do Notion:
 - **Drive:** cria a estrutura de pastas (Empresa > Departamento > Competência > …) e salva os anexos do Notion no Drive, marcando a linha como **Concluído**.
 
 ```
-Página (Vercel) ──POST {acao, senha}──▶ Apps Script (doPost) ──▶ Notion + Gmail + Drive
+Página (Vercel) ──POST {acao}──▶ Apps Script (doPost) ──▶ Notion + Gmail + Drive
 ```
 
 | Arquivo | Onde fica | O que faz |
 |---|---|---|
-| `index.html` | Vercel | Painel com senha e os botões |
-| `apps-script/Api.gs` | Apps Script | `doPost`: confere a senha e chama a ação |
+| `index.html` | Vercel | Painel com os botões |
+| `apps-script/Api.gs` | Apps Script | `doPost`: recebe a ação e chama a função certa |
 | `apps-script/Emails.gs` | Apps Script | Modelos e disparo de e-mails |
 | `apps-script/Drive.gs` | Apps Script | Criação de pastas e envio de arquivos |
 
@@ -23,7 +23,6 @@ Página (Vercel) ──POST {acao, senha}──▶ Apps Script (doPost) ──�
 
 | Propriedade | Uso |
 |---|---|
-| `PAINEL_SENHA` | Senha digitada na página |
 | `NOTION_TOKEN_EMAILS` | Token da integração do Notion da base de e-mails (o `NOTION_TOKEN` do projeto antigo "Envio Email") |
 | `DATABASE_ID` | Base do Notion dos e-mails |
 | `NOTION_TOKEN_DRIVE` | Token da integração do Notion da base do Drive (o `NOTION_TOKEN` do projeto antigo "Notion Arquivos Drive") |

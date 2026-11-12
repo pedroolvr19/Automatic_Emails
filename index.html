@@ -132,7 +132,6 @@
   <div class="card">
     <h1>Painel de Automações</h1>
     <p class="intro">Preencha os cards no Notion e processe os pendentes por aqui.</p>
-    <input id="senha" class="campo" type="password" placeholder="Senha do painel" autocomplete="current-password">
 
     <div class="secao">
       <h2>E-mails</h2>
@@ -161,10 +160,7 @@
     // URL da implantação do App da Web no Apps Script (termina em /exec)
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbRDI0wZ6TP1LksG_gaG95ol7n9-dq_1fG9zOr6XL5XONwlP5pD2VqyVwpiJbNPtVzPw/exec';
 
-    const campoSenha = document.getElementById('senha');
     const botoes = document.querySelectorAll('button[data-acao]');
-
-    try { campoSenha.value = localStorage.getItem('painelSenha') || ''; } catch (e) {}
 
     botoes.forEach(function (btn) {
       btn.addEventListener('click', function () { executar(btn); });
@@ -178,15 +174,8 @@
       const saida = btn.dataset.saida;
       const status = document.getElementById('status' + saida);
       const resultados = document.getElementById('resultados' + saida);
-      const senha = campoSenha.value.trim();
 
       resultados.innerHTML = '';
-      if (!senha) {
-        status.className = 'status erro';
-        status.textContent = 'Informe a senha do painel.';
-        campoSenha.focus();
-        return;
-      }
 
       travarBotoes(true);
       btn.innerHTML = '<span class="spinner"></span>' + btn.dataset.carregando;
@@ -198,7 +187,7 @@
         const resposta = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ acao: btn.dataset.acao, senha: senha })
+          body: JSON.stringify({ acao: btn.dataset.acao })
         });
         const dados = await resposta.json();
 
@@ -207,8 +196,6 @@
           status.textContent = 'Erro: ' + dados.mensagem;
           return;
         }
-
-        try { localStorage.setItem('painelSenha', senha); } catch (e) {}
 
         if (Array.isArray(dados.resultados)) {
           status.className = 'status';
