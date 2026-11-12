@@ -3,179 +3,233 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel de Disparos - Notion</title>
+  <title>Painel de Automações - Notion</title>
 
   <style>
     * {
       box-sizing: border-box;
       font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     }
-
     body {
       margin: 0;
-      padding: 40px 20px;
+      padding: 40px 16px;
       background: #191919;
       color: #f0efed;
       display: flex;
       justify-content: center;
-      align-items: center;
       min-height: 100vh;
     }
-
     .card {
       background: #191919;
       border: 1px solid #2f2f2f;
       border-radius: 6px;
-      padding: 32px;
-      max-width: 380px;
+      padding: 28px;
+      max-width: 480px;
       width: 100%;
-      text-align: center;
     }
-
-    .icon {
-      margin-bottom: 16px;
-      color: #9b9b9b;
-    }
-
     h1 {
       font-size: 19px;
       font-weight: 600;
-      margin: 0 0 8px;
-      color: #f0efed;
+      margin: 0 0 6px;
       letter-spacing: -0.01em;
     }
-
-    p {
-      font-size: 13px;
+    p.intro {
       color: #9b9b9b;
-      margin: 0 0 28px;
+      font-size: 13px;
       line-height: 1.5;
+      margin: 0 0 16px;
     }
-
-    .btn {
-      background: #2f2f2f;
+    .secao {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #2f2f2f;
+    }
+    h2 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 4px;
+    }
+    p.subtitulo {
+      color: #9b9b9b;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0 0 14px;
+    }
+    .campo {
+      width: 100%;
+      background: #202020;
       color: #f0efed;
       border: 1px solid #373737;
-      padding: 8px 14px;
-      font-size: 14px;
-      font-weight: 500;
       border-radius: 4px;
-      cursor: pointer;
-      width: 100%;
-      transition: background 0.1s ease;
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+    .campo:focus {
+      outline: none;
+      border-color: #5a5a5a;
+    }
+    .botoes {
       display: flex;
-      justify-content: center;
-      align-items: center;
       gap: 8px;
     }
-
-    .btn:hover:not(:disabled) {
-      background: #373737;
+    button {
+      flex: 1;
+      width: 100%;
+      padding: 8px 14px;
+      border: 1px solid #373737;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.1s ease;
+      background: #2f2f2f;
+      color: #f0efed;
     }
-
-    .btn:active:not(:disabled) {
-      background: #3f3f3f;
+    button:hover:not(:disabled) { background: #373737; }
+    button:active:not(:disabled) { background: #3f3f3f; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #9b9b9b;
+      line-height: 1.5;
     }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .status:empty { display: none; }
+    .status.ok { color: #7ee2b8; }
+    .status.erro { color: #f2555a; }
+    .resultados {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
-
-    #status-box {
-      margin-top: 20px;
-      padding: 10px 12px;
+    .item {
+      padding: 8px 10px;
       border-radius: 4px;
       font-size: 13px;
       line-height: 1.5;
-      font-weight: 500;
-      display: none;
-      text-align: left;
-    }
-
-    .status-loading {
-      background: #202020;
-      color: #9b9b9b;
+      word-break: break-word;
       border: 1px solid #2f2f2f;
+      background: #202020;
     }
-    .status-success {
-      background: #1e2a25;
-      color: #7ee2b8;
-      border: 1px solid #2b3a33;
-    }
-    .status-error {
-      background: #291d1d;
-      color: #f2555a;
-      border: 1px solid #3a2323;
-    }
-
+    .item.ok { color: #7ee2b8; border-color: #2b3a33; background: #1e2a25; }
+    .item.erro { color: #f2555a; border-color: #3a2323; background: #291d1d; }
     .spinner {
+      display: inline-block;
       width: 12px;
       height: 12px;
       border: 2px solid rgba(240,239,237,0.25);
-      border-radius: 50%;
       border-top-color: #f0efed;
-      animation: spin 0.6s linear infinite;
-      display: none;
+      border-radius: 50%;
+      animation: girar 0.6s linear infinite;
+      margin-right: 8px;
+      vertical-align: -1px;
     }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes girar { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-
   <div class="card">
-    <svg class="icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-      <polyline points="22,6 12,13 2,6"></polyline>
-    </svg>
+    <h1>Painel de Automações</h1>
+    <p class="intro">Preencha os cards no Notion e processe os pendentes por aqui.</p>
+    <input id="senha" class="campo" type="password" placeholder="Senha do painel" autocomplete="current-password">
 
-    <h1>Disparo de E-mails</h1>
-    <p>Sincronize com sua base do Notion e processe os envios pendentes com um clique.</p>
+    <div class="secao">
+      <h2>E-mails</h2>
+      <p class="subtitulo">Envia os cards com status Pendente usando o modelo escolhido e marca como Enviado.</p>
+      <button data-acao="emails" data-rotulo="Processar Pendentes" data-carregando="Enviando..."
+              data-saida="Emails">Processar Pendentes</button>
+      <div class="status" id="statusEmails"></div>
+      <div class="resultados" id="resultadosEmails"></div>
+    </div>
 
-    <button id="btn-enviar" class="btn" onclick="iniciarDisparo()">
-      <span class="spinner" id="spinner"></span>
-      <span id="btn-text">Processar Pendentes</span>
-    </button>
-
-    <div id="status-box"></div>
+    <div class="secao">
+      <h2>Drive</h2>
+      <p class="subtitulo">"Criar caminho" monta as pastas (Empresa &gt; Departamento &gt; Competência &gt; …) sem enviar arquivo. "Enviar arquivo" salva os anexos no caminho e marca a linha como Concluído.</p>
+      <div class="botoes">
+        <button data-acao="drive-caminho" data-rotulo="Criar caminho" data-carregando="Criando..."
+                data-saida="Drive">Criar caminho</button>
+        <button data-acao="drive-enviar" data-rotulo="Enviar arquivo" data-carregando="Enviando..."
+                data-saida="Drive">Enviar arquivo</button>
+      </div>
+      <div class="status" id="statusDrive"></div>
+      <div class="resultados" id="resultadosDrive"></div>
+    </div>
   </div>
 
   <script>
-    function iniciarDisparo() {
-      const btn = document.getElementById('btn-enviar');
-      const btnText = document.getElementById('btn-text');
-      const spinner = document.getElementById('spinner');
-      const statusBox = document.getElementById('status-box');
+    // URL da implantação do App da Web no Apps Script (termina em /exec)
+    const APPS_SCRIPT_URL = 'COLE_AQUI_A_URL_DO_APP_DA_WEB';
 
-      btn.disabled = true;
-      spinner.style.display = 'block';
-      btnText.innerText = 'Enviando...';
+    const campoSenha = document.getElementById('senha');
+    const botoes = document.querySelectorAll('button[data-acao]');
 
-      statusBox.style.display = 'block';
-      statusBox.className = 'status-loading';
-      statusBox.textContent = 'Buscando tarefas e disparando e-mails. Aguarde...';
+    try { campoSenha.value = localStorage.getItem('painelSenha') || ''; } catch (e) {}
 
-      google.script.run
-        .withSuccessHandler(function(mensagem) {
-          btn.disabled = false;
-          spinner.style.display = 'none';
-          btnText.innerText = 'Processar Pendentes';
+    botoes.forEach(function (btn) {
+      btn.addEventListener('click', function () { executar(btn); });
+    });
 
-          statusBox.className = 'status-success';
-          statusBox.textContent = mensagem ? mensagem : "✅ Disparo concluído com sucesso!";
-        })
-        .withFailureHandler(function(erro) {
-          btn.disabled = false;
-          spinner.style.display = 'none';
-          btnText.innerText = 'Tentar Novamente';
+    function travarBotoes(travar) {
+      botoes.forEach(function (b) { b.disabled = travar; });
+    }
 
-          statusBox.className = 'status-error';
-          statusBox.textContent = "Erro: " + erro.message;
-        })
-        .dispararEmails();
+    async function executar(btn) {
+      const saida = btn.dataset.saida;
+      const status = document.getElementById('status' + saida);
+      const resultados = document.getElementById('resultados' + saida);
+      const senha = campoSenha.value.trim();
+
+      resultados.innerHTML = '';
+      if (!senha) {
+        status.className = 'status erro';
+        status.textContent = 'Informe a senha do painel.';
+        campoSenha.focus();
+        return;
+      }
+
+      travarBotoes(true);
+      btn.innerHTML = '<span class="spinner"></span>' + btn.dataset.carregando;
+      status.className = 'status';
+      status.textContent = 'Processando no Notion. Aguarde...';
+
+      try {
+        // Corpo em texto puro evita a verificação de CORS (preflight), que o Apps Script não responde
+        const resposta = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ acao: btn.dataset.acao, senha: senha })
+        });
+        const dados = await resposta.json();
+
+        if (!dados.ok) {
+          status.className = 'status erro';
+          status.textContent = 'Erro: ' + dados.mensagem;
+          return;
+        }
+
+        try { localStorage.setItem('painelSenha', senha); } catch (e) {}
+
+        if (Array.isArray(dados.resultados)) {
+          status.className = 'status';
+          status.textContent = dados.total + ' linha(s) encontrada(s).';
+          dados.resultados.forEach(function (r) {
+            const div = document.createElement('div');
+            div.className = 'item ' + (r.sucesso ? 'ok' : 'erro');
+            div.textContent = (r.sucesso ? '✓ ' : '✗ ') + r.mensagem;
+            resultados.appendChild(div);
+          });
+        } else {
+          status.className = 'status ok';
+          status.textContent = dados.mensagem || 'Concluído.';
+        }
+      } catch (erro) {
+        status.className = 'status erro';
+        status.textContent = 'Não foi possível falar com o Apps Script (' + erro.message + ').';
+      } finally {
+        travarBotoes(false);
+        btn.textContent = btn.dataset.rotulo;
+      }
     }
   </script>
 </body>

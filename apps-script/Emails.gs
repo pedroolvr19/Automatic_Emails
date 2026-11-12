@@ -1,17 +1,14 @@
-// ==========================================
-// 1. FUNÇÃO WEB
-// ==========================================
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('index')
-      .setTitle('Painel de Disparos - Notion')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
+// ===================================================================
+// AUTOMAÇÃO: NOTION → E-MAILS (Gmail)
+// Propriedades: NOTION_TOKEN_EMAILS, DATABASE_ID
+// ===================================================================
 
 // ==========================================
 // 2. CONFIGURAÇÕES 
 // ==========================================
 function getHeaders() {
-  const token = PropertiesService.getScriptProperties().getProperty('NOTION_TOKEN');
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty('NOTION_TOKEN_EMAILS') || props.getProperty('NOTION_TOKEN');
   return {
     'Authorization': `Bearer ${token}`,
     'Notion-Version': '2022-06-28',
