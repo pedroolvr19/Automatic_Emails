@@ -188,7 +188,11 @@ function prepararLinha(pagina) {
 
   const segmentosFinais = obterSegmentosFinais(departamento, regime, complementoDP);
   if (!segmentosFinais) {
-    return { erro: `Caminho não configurado pra "${departamento}" (id: ${pagina.id})` };
+    let motivo;
+    if (departamento === 'Fiscal') motivo = `preencha "${PROP_REGIME}"`;
+    else if (departamento === 'Departamento Pessoal') motivo = `preencha "${PROP_COMPLEMENTO_DP}"`;
+    else motivo = 'departamento sem pastas configuradas em SEGMENTOS_FIXOS_POR_DEPARTAMENTO';
+    return { erro: `${cliente} / ${departamento}: ${motivo} (id: ${pagina.id})` };
   }
 
   return { caminho: [cliente, departamento, competencia, ...segmentosFinais] };
