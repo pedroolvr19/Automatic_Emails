@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Disparos - Notion</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 40px 20px;
+      background: #191919;
+      color: #f0efed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #191919;
+      border: 1px solid #2f2f2f;
+      border-radius: 6px;
+      padding: 32px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .icon {
+      margin-bottom: 16px;
+      color: #9b9b9b;
+    }
+
+    h1 {
+      font-size: 19px;
+      font-weight: 600;
+      margin: 0 0 8px;
+      color: #f0efed;
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      font-size: 13px;
+      color: #9b9b9b;
+      margin: 0 0 28px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      background: #2f2f2f;
+      color: #f0efed;
+      border: 1px solid #373737;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.1s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #373737;
+    }
+
+    .btn:active:not(:disabled) {
+      background: #3f3f3f;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #status-box {
+      margin-top: 20px;
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 500;
+      display: none;
+      text-align: left;
+    }
+
+    .status-loading {
+      background: #202020;
+      color: #9b9b9b;
+      border: 1px solid #2f2f2f;
+    }
+    .status-success {
+      background: #1e2a25;
+      color: #7ee2b8;
+      border: 1px solid #2b3a33;
+    }
+    .status-error {
+      background: #291d1d;
+      color: #f2555a;
+      border: 1px solid #3a2323;
+    }
+
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(240,239,237,0.25);
+      border-radius: 50%;
+      border-top-color: #f0efed;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <svg class="icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+      <polyline points="22,6 12,13 2,6"></polyline>
+    </svg>
+
+    <h1>Disparo de E-mails</h1>
+    <p>Sincronize com sua base do Notion e processe os envios pendentes com um clique.</p>
+
+    <button id="btn-enviar" class="btn" onclick="iniciarDisparo()">
+      <span class="spinner" id="spinner"></span>
+      <span id="btn-text">Processar Pendentes</span>
+    </button>
+
+    <div id="status-box"></div>
+  </div>
+
+  <script>
+    function iniciarDisparo() {
+      const btn = document.getElementById('btn-enviar');
+      const btnText = document.getElementById('btn-text');
+      const spinner = document.getElementById('spinner');
+      const statusBox = document.getElementById('status-box');
+
+      btn.disabled = true;
+      spinner.style.display = 'block';
+      btnText.innerText = 'Enviando...';
+
+      statusBox.style.display = 'block';
+      statusBox.className = 'status-loading';
+      statusBox.textContent = 'Buscando tarefas e disparando e-mails. Aguarde...';
+
+      google.script.run
+        .withSuccessHandler(function(mensagem) {
+          btn.disabled = false;
+          spinner.style.display = 'none';
+          btnText.innerText = 'Processar Pendentes';
+
+          statusBox.className = 'status-success';
+          statusBox.textContent = mensagem ? mensagem : "✅ Disparo concluído com sucesso!";
+        })
+        .withFailureHandler(function(erro) {
+          btn.disabled = false;
+          spinner.style.display = 'none';
+          btnText.innerText = 'Tentar Novamente';
+
+          statusBox.className = 'status-error';
+          statusBox.textContent = "Erro: " + erro.message;
+        })
+        .dispararEmails();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+# Credenciais / configuração local (nunca versionar o token do Notion)
+.env
+.clasp.json
+.clasprc.json
